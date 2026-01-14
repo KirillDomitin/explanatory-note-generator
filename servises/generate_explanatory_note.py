@@ -1,0 +1,97 @@
+import logging
+
+import requests
+
+from func.address import get_address
+from func.ceo import get_ceo
+from func.charter_capital import get_charter_capital
+from func.okved import get_okved
+from func.participants import get_participants
+from func.registration_date import get_registration_date
+from settings import URL, HEADERS
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+
+
+def explanatory_note(inn: int):
+    logger.info(f"Запрос ИНН: {inn}")
+
+    try:
+        response = requests.get(URL.format(inn), headers=HEADERS, timeout=10)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise ValueError(f"API вернул ошибку: {e.response.status_code}") from e
+    except requests.exceptions.RequestException as e:
+        raise ValueError(f"Не удалось выполнить запрос к API: {str(e)}") from e
+
+    try:
+        result = response.json()
+        logger.info(f"Ответ валидирован")
+    except Exception as e:
+        raise ValueError("Ответ API не является валидным JSON") from e
+
+    try:
+        common = result["СвЮЛ"]
+    except KeyError:
+        raise ValueError("В ответе API отсутствует блок 'СвЮЛ'") from None
+
+    try:
+        common_name = common["СвНаимЮЛ"]
+        full_company_name = common_name["@attributes"]["НаимЮЛПолн"]
+        short_company_name = common_name["СвНаимЮЛСокр"]["@attributes"]["НаимСокр"]
+    except (KeyError, TypeError) as e:
+        logger.error("Не удалось получить название компании — отсутствует или неверный формат блока 'СвНаимЮЛ'")
+        raise ValueError(
+            "Не удалось получить название компании — отсутствует или неверный формат блока 'СвНаимЮЛ'") from e
+
+    try:
+        registration_date = get_registration_date(common)
+    except Exception as e:
+        logger.error(f"Не удалось получить дату регистрации: {str(e)}")
+        raise ValueError(f"Не удалось получить дату регистрации: {str(e)}") from e
+
+    try:
+        legal_address = get_address(common)
+    except Exception as e:
+        logger.error(f"Не удалось получить юридический адрес: {str(e)}")
+        raise ValueError(f"Не удалось получить юридический адрес: {str(e)}") from e
+
+    try:
+        charter_capital = get_charter_capital(common)
+    except Exception as e:
+        logger.error(f"Не удалось получить уставный капитал: {str(e)}")
+        raise ValueError(f"Не удалось получить уставный капитал: {str(e)}") from e
+
+    try:
+        participants = get_participants(common)
+    except Exception as e:
+        logger.error(f"Не удалось получить участников: {str(e)}")
+        raise ValueError(f"Не удалось получить участников: {str(e)}") from e
+
+    try:
+        activities_list = get_okved(common)
+    except Exception as e:
+        logger.error(f"Не удалось получить список ОКВЭД: {str(e)}")
+        raise ValueError(f"Не удалось получить список ОКВЭД: {str(e)}") from e
+
+    try:
+        ceo_name = get_ceo(common)
+    except Exception as e:
+        logger.error(f"Не удалось получить данные генерального директора: {str(e)}")
+        raise ValueError(f"Не удалось получить данные генерального директора: {str(e)}") from e
+
+    logger.info("Все поля успешно извлечены")
+    return {
+        "full_company_name": full_company_name,
+        "short_company_name": short_company_name,
+        "registration_date": registration_date,
+        "legal_address": legal_address,
+        "charter_capital": charter_capital,
+        "participants": participants,
+        "activities_list": activities_list,
+        "ceo_name": ceo_name
+    }
