@@ -60,13 +60,3 @@
    docker logs -f docx-app
    ```
     Доступ: http://localhost:8000/docs или по IP сервера
-
-### Структура проекта (основные файлы)
-   ```text
-    ├── app.py                  # FastAPI приложение и эндпоинт
-    ├── explanatory_note.py     # основная логика парсинга и формирования context
-    ├── func/                   # модули парсинга отдельных полей (address, ceo, okved и т.д.)
-    ├── template.docx           # шаблон пояснительной записки с {{ плейсхолдерами }}
-    ├── pyproject.toml
-    ├── uv.lock
-    └── Dockerfile
