@@ -2,12 +2,7 @@ import logging
 
 import requests
 
-from func.address import get_address
-from func.ceo import get_ceo
-from func.charter_capital import get_charter_capital
-from func.okved import get_okved
-from func.participants import get_participants
-from func.registration_date import get_registration_date
+from func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date
 from settings import URL, HEADERS
 
 logger = logging.getLogger(__name__)
