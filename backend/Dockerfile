@@ -1,5 +1,5 @@
 # Стадия 1 — сборка зависимостей
-FROM ghcr.io/astral-sh/uv:python3.13 AS builder
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS builder
 
 WORKDIR /app
 
