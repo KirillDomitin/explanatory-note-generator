@@ -3,7 +3,7 @@ FROM ghcr.io/astral-sh/uv:python3.13-alpine AS builder
 WORKDIR /app
 COPY pyproject.toml uv.lock* ./
 
-RUN uv venv .venv && \
+RUN uv venv --python-preference system .venv && \
     . .venv/bin/activate && \
     uv sync --frozen
 
