@@ -10,6 +10,4 @@ RUN pip install --no-cache-dir uv \
 
 COPY . .
 
-ENV PATH="/app/.venv/bin:${PATH}"
-
 CMD ["/app/.venv/bin/python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
