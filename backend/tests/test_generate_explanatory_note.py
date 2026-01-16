@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from servises.generate_explanatory_note import explanatory_note
-from tests.moks import MOCK_RESPONSES
+from ..servises.generate_explanatory_note import explanatory_note
+from .moks import MOCK_RESPONSES
 
 
 def test_explanatory_note_single_participant(mocker):

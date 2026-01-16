@@ -5,6 +5,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [downloadLink, setDownloadLink] = useState(null)
+  const [generatedFileName, setGeneratedFileName] = useState('')
 
   const generate = async () => {
     if (!inn.trim() || inn.length !== 10 && inn.length !== 12) {
@@ -26,6 +27,7 @@ function App() {
 
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
+      setGeneratedFileName(`Пояснения_${inn}.docx`)
       setDownloadLink(url)
       setInn(``)
       setMessage('Файл готов!')
@@ -75,10 +77,10 @@ function App() {
         <div style={{ marginTop: '20px' }}>
           <a
             href={downloadLink}
-            download={`Пояснения_${inn}.docx`}
+            download={generatedFileName}
             style={{ color: '#0066cc', fontSize: '18px', textDecoration: 'underline' }}
           >
-            Скачать готовый файл
+            Скачать готовый файл ({generatedFileName})
           </a>
         </div>
       )}
