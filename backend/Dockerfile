@@ -26,4 +26,5 @@ COPY . .
 ENV PATH="/app/.venv/bin:${PATH}"
 
 # Запускаем через python -m uvicorn — работает в 99% случаев
-CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+#CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/app/.venv/bin/uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
