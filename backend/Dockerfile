@@ -12,4 +12,4 @@ COPY . .
 
 ENV PATH="/app/.venv/bin:${PATH}"
 
-CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/app/.venv/bin/python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
