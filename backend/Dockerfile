@@ -5,22 +5,22 @@ WORKDIR /app
 
 COPY pyproject.toml uv.lock* ./
 
-RUN uv sync --frozen --no-install-project
+# Явно создаём venv с managed python (uv сам скачает и установит python в venv)
+RUN uv venv --python-preference managed .venv && \
+    . .venv/bin/activate && \
+    uv sync --frozen
 
 # Финальная стадия
 FROM python:3.13-slim
 
 WORKDIR /app
 
-# Копируем установленные пакеты из builder
-COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
-COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
+# Копируем полноценный venv (теперь python внутри будет правильный)
+COPY --from=builder /app/.venv /app/.venv
 
-# Копируем код
 COPY . .
 
-# Делаем uvicorn исполняемым (на всякий случай)
-RUN chmod +x /usr/local/bin/uvicorn
+ENV PATH="/app/.venv/bin:${PATH}"
 
-# Запускаем напрямую
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Запускаем через uvicorn напрямую из venv
+CMD ["/app/.venv/bin/uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
