@@ -1,8 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from ..servises.generate_explanatory_note import explanatory_note
+import sys
+from pathlib import Path
+
 from .moks import MOCK_RESPONSES
+from ..servises.generate_explanatory_note import explanatory_note
+
+# Добавляем корень backend в sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
 def test_explanatory_note_single_participant(mocker):
