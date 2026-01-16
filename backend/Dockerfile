@@ -6,7 +6,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock* ./
 
 # Явно создаём venv с managed python (uv сам скачает и установит python в venv)
-RUN uv venv --python-preference managed .venv && \
+RUN uv venv --python-preference system .venv && \
     . .venv/bin/activate && \
     uv sync --frozen
 
