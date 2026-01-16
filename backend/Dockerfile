@@ -24,13 +24,13 @@ WORKDIR /app
 COPY pyproject.toml uv.lock* ./
 
 RUN pip install --no-cache-dir uv \
-    && uv venv /opt/venv \
-    && . /opt/venv/bin/activate \
+    && uv venv /app/venv \
+    && . /app/venv/bin/activate \
     && uv sync --frozen
 
 COPY . .
 
-ENV PATH="/opt/venv/bin:${PATH}"
+ENV PATH="/app/venv/bin:${PATH}"
 
 CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 
