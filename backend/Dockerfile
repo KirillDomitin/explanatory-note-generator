@@ -1,5 +1,5 @@
 # Стадия 1 — сборка зависимостей
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.13 AS builder
 
 WORKDIR /app
 
