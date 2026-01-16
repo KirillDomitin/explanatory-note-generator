@@ -1,8 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from ..func import get_address, get_ceo,get_charter_capital,get_okved,get_participants,get_registration_date
+import sys
+from pathlib import Path
+
 from .moks import MOCK_RESPONSES
+from ..func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date
+
+# Добавляем корень backend в sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 common_data = MOCK_RESPONSES[0]["СвЮЛ"]
 
@@ -35,10 +41,11 @@ def test_charter_single_participants():
 
 
 def test_charter_multi_participants():
-    result = func.get_participants(MOCK_RESPONSES[1]['СвЮЛ'])
+    result = get_participants(MOCK_RESPONSES[1]['СвЮЛ'])
     assert result == ['Соколов Алексей Петрович с долей 70 процентов;',
                       'Волкова Марина Ивановна с долей 30 процентов;']
 
+
 def test_registration_date():
-    result = func.get_registration_date(common_data)
+    result = get_registration_date(common_data)
     assert result == '2015-06-22'
