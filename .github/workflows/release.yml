@@ -3,7 +3,7 @@ name: Release to Docker Hub
 on:
   push:
     tags:
-      - 'v*.*.*'          # срабатывает только на теги вида v0.0.1, v1.2.3 и т.д.
+      - 'v*.*.*'          # v0.0.1, v1.2.3 и т.д.
 
 jobs:
   test-and-build:
@@ -13,6 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Backend: тесты и сборка
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -21,11 +23,13 @@ jobs:
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-      - name: Install dependencies
+      - name: Install backend dependencies
+        working-directory: ./backend
         run: |
           uv sync --dev
 
-      - name: Run tests
+      - name: Run backend tests
+        working-directory: ./backend
         run: |
           uv run pytest -v
 
@@ -39,11 +43,24 @@ jobs:
         id: vars
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Build and push Docker image
+      # Backend — билд и пуш
+      - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: |
-            domitin/docx-generator:latest
-            domitin/docx-generator:${{ steps.vars.outputs.version }}
+            domitin/docx-backend:latest
+            domitin/docx-backend:${{ steps.vars.outputs.version }}
+
+      # Frontend — билд и пуш (без тестов)
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            domitin/docx-frontend:latest
+            domitin/docx-frontend:${{ steps.vars.outputs.version }}
