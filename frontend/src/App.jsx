@@ -18,7 +18,7 @@ function App() {
     setDownloadLink(null)
 
     try {
-      const res = await fetch(`http://backend/api/v1/generate/?inn=${inn}`)
+      const res = await fetch(`http://185.246.220.130/api/v1/generate/?inn=${inn}`)
 
       if (!res.ok) {
         const err = await res.json()
