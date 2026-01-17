@@ -31,7 +31,7 @@ async def generate_document(inn: int):
         raise HTTPException(status_code=400, detail="ИНН должен быть 10 или 12 цифр")
 
     try:
-        context = explanatory_note(inn)
+        context = await explanatory_note(inn)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

@@ -1,8 +1,9 @@
 import logging
 
 import requests
+import httpx
 
-from func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date
+from func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date, get_response
 from settings import URL, HEADERS
 
 logger = logging.getLogger(__name__)
@@ -12,16 +13,14 @@ logging.basicConfig(
 )
 
 
-def explanatory_note(inn: int):
+async def explanatory_note(inn: int):
     logger.info(f"Запрос ИНН: {inn}")
 
     try:
-        response = requests.get(URL.format(inn), headers=HEADERS, timeout=10)
+        response = await get_response(URL.format(inn))
         response.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        raise ValueError(f"API вернул ошибку: {e.response.status_code}") from e
-    except requests.exceptions.RequestException as e:
-        raise ValueError(f"Не удалось выполнить запрос к API: {str(e)}") from e
+    except httpx.HTTPError as e:
+        raise ValueError(f"API вернул ошибку: {e}")
 
     try:
         result = response.json()
