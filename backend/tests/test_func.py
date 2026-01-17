@@ -15,17 +15,17 @@ common_data = MOCK_RESPONSES[0]["СвЮЛ"]
 
 def test_address_success():
     result = get_address(common_data)
-    assert result == '125009,Г.Москва,Тверская ул,д.5/7,стр.2,3, ПОМЕЩ.VII, КОМН.12, ОФИС 4Б'
+    assert result == "125009,Г.Москва,Тверская ул,д.5/7,стр.2,подв. 3, помещ.vii, комн.12, офис 4б"
 
 
 def test_ceo_success():
     result = get_ceo(common_data)
-    assert result == 'Соколов Алексей Петрович'
+    assert result == "Генеральный Директор Общества: Соколов Алексей Петрович"
 
 
 def test_charter_capital_success():
     result = get_charter_capital(common_data)
-    assert result == '15000'
+    assert result == "15000 (пятнадцать тысяч) рублей."
 
 
 def test_charter_capital_okved():
