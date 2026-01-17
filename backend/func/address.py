@@ -18,18 +18,24 @@ def get_address(data: dict) -> str:
         parts.append(street)
 
         building_parts = common_address.get("Здание", [])
+        if isinstance(building_parts, dict):
+            building_parts = [building_parts]
         for part in building_parts:
-            building_name = part.get("@attributes").get("Номер", "").lower()
+            building_name = part.get("@attributes", {}).get("Номер", "").lower()
             building_type = part.get("@attributes", {}).get("Тип", "").lower()
-            building = "".join([building_type, building_name])
-            parts.append(building)
+            if all([building_type, building_type]):
+                building = "".join([building_type, building_name])
+                parts.append(building)
 
-        office = common_address.get("ПомещЗдания", {}).get("@attributes", {}).get("Номер", "")
-        if office:
+        office_parts = common_address.get("ПомещЗдания", {}).get("@attributes", {})
+        office_name = office_parts.get("Номер", "").lower()
+        office_type = office_parts.get("Тип", "").lower()
+        if all([office_name, office_type]):
+            office = " ".join([office_type, office_name])
             parts.append(office)
     else:
         common_address = data.get("СвАдресЮЛ", {}).get("АдресРФ", "")
-        mail_index = common_address.get("@attributes").get("Индекс")
+        mail_index = common_address.get("@attributes").get("Индекс", "")
         city = common_address.get("Регион", {}).get("@attributes", {}).get("НаимРегион", "").title()
         street_name = common_address.get("Улица", {}).get("@attributes", {}).get("НаимУлица", "").title()
         street_type = common_address.get("Улица", {}).get("@attributes", {}).get("ТипУлица", "").lower()
