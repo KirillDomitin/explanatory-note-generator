@@ -75,7 +75,7 @@ async def explanatory_note(inn: int):
     try:
         ceos = get_ceo(common)
         if len(ceos) == 1:
-            staff_administration = "0"
+            staff_administration = ""
         else:
             staff_administration = "1"
     except Exception as e:
