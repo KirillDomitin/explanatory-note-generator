@@ -20,7 +20,8 @@ def test_address_success():
 
 def test_ceo_success():
     result = get_ceo(common_data)
-    assert result == "Генеральный Директор Общества: Соколов Алексей Петрович"
+    assert result == ['Генеральный Директор Общества: Соколов Алексей Петрович',
+                      'Главный Бухгалтер Общества: Соколов Алексей Петрович']
 
 
 def test_charter_capital_success():

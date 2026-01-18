@@ -73,7 +73,11 @@ async def explanatory_note(inn: int):
         raise ValueError(f"Не удалось получить список ОКВЭД: {str(e)}") from e
 
     try:
-        ceo_name = get_ceo(common)
+        ceos = get_ceo(common)
+        if len(ceos) == 1:
+            staff_administration = "0"
+        else:
+            staff_administration = "1"
     except Exception as e:
         logger.error(f"Не удалось получить данные генерального директора: {str(e)}")
         raise ValueError(f"Не удалось получить данные генерального директора: {str(e)}") from e
@@ -87,5 +91,6 @@ async def explanatory_note(inn: int):
         "charter_capital": charter_capital,
         "participants": participants,
         "activities_list": activities_list,
-        "ceo_name": ceo_name
+        "ceos": ceos,
+        "staff_administration": staff_administration
     }
