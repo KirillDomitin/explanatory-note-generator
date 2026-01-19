@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ARG APP_VERSION
+ENV VITE_APP_VERSION=${APP_VERSION}
+
 # Копируем только зависимости сначала — для кэширования
 COPY package*.json ./
 RUN npm ci

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-const APP_VERSION = import.meta.env.VITE_APP_VERSION
 
 function App() {
   const [inn, setInn] = useState('')
@@ -7,6 +6,8 @@ function App() {
   const [message, setMessage] = useState('')
   const [downloadLink, setDownloadLink] = useState(null)
   const [generatedFileName, setGeneratedFileName] = useState('')
+  const APP_VERSION = import.meta.env.VITE_APP_VERSION
+
 
 
   const generate = async () => {
