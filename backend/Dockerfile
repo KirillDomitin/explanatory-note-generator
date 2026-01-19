@@ -6,7 +6,7 @@ COPY pyproject.toml uv.lock* ./
 
 RUN pip install --no-cache-dir uv \
     && uv venv .venv \
-    && uv sync --frozen
+    && uv sync  --frozen
 
 COPY . .
 

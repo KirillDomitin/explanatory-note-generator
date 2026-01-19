@@ -6,6 +6,8 @@ function App() {
   const [message, setMessage] = useState('')
   const [downloadLink, setDownloadLink] = useState(null)
   const [generatedFileName, setGeneratedFileName] = useState('')
+  const APP_VERSION = import.meta.env.VITE_APP_VERSION
+
 
   const generate = async () => {
     if (!inn.trim() || inn.length !== 10 && inn.length !== 12) {
@@ -18,7 +20,7 @@ function App() {
     setDownloadLink(null)
 
     try {
-      const res = await fetch(`http://185.246.220.130/api/v1/generate/?inn=${inn}`)
+      const res = await fetch(`/api/v1/generate/?inn=${inn}`)
 
       if (!res.ok) {
         const err = await res.json()
@@ -84,6 +86,9 @@ function App() {
           </a>
         </div>
       )}
+      <footer style={{ textAlign: 'center', padding: '12px', fontSize: '12px', color: '#999'}}>
+        v{APP_VERSION}
+      </footer>
     </div>
   )
 }
