@@ -87,7 +87,7 @@ function App() {
           </a>
         </div>
       )}
-      <footer style={{ textAlign: 'center', padding: '12px', fontSize: '12px', color: '#999'}}>
+      <footer style={{ textAlign: 'right', padding: '12px', fontSize: '12px', color: '#999'}}>
         v{APP_VERSION}
       </footer>
     </div>
