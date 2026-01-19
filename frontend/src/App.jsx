@@ -7,6 +7,8 @@ function App() {
   const [message, setMessage] = useState('')
   const [downloadLink, setDownloadLink] = useState(null)
   const [generatedFileName, setGeneratedFileName] = useState('')
+  const APP_VERSION = import.meta.env.VITE_APP_VERSION
+
 
 
   const generate = async () => {
