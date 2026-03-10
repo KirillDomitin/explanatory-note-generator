@@ -11,3 +11,4 @@ venv/
 *.log
 .git
 .vscode
+alembic/versions/__pycache__/

@@ -1,13 +1,185 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Dashboard</title>
+<style>
+:root {
+  --bg: #0e1117;
+  --card: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #2f81f7;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Header */
+header {
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.logout {
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* Content */
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.4);
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0d1117;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+button {
+  padding: 14px 24px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+pre {
+  margin-top: 20px;
+  background: #0d1117;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  color: #9ecbff;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h2>🚀 Backend Dashboard</h2>
+  <div class="logout" onclick="logout()">Logout</div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h3>Генератор пояснительной записки</h3>
+    <input id="value" placeholder="Введите ИНН..." />
+    <button onclick="send()">Генерировать</button>
+    <pre id="result"></pre>
+  </div>
+</div>
+
+<script>
+async function logout() {
+  const access_token = localStorage.getItem("access_token");
+  const refresh_token = localStorage.getItem("refresh_token");
+
+  const payload = {
+    access_token: access_token,
+    refresh_token: refresh_token
+  };
+  console.log(payload);
+  if (access_token) {
+    try {
+      // отправляем запрос logout на backend
+<!--      await fetch(`/api/v1/auth/logout/${encodeURIComponent(refresh_token)}`, {-->
+      await fetch(`/api/v1/auth/logout/`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + access_token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      console.error("Ошибка logout:", err);
+      // даже если запрос не прошёл, очищаем localStorage
+    }
+  }
+
+  // очищаем localStorage и переходим на страницу логина
+  localStorage.clear();
+  window.location.href = "/login.html";
+}
+
+async function send() {
+  const access_token = localStorage.getItem("access_token");
+  const refresh_token = localStorage.getItem("refresh_token");
+  if (!access_token) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  const inn = document.getElementById("value").value.trim();
+  if (!inn) {
+    alert("Введите ИНН");
+    return;
+  }
+
+  const res = await fetch(`/api/v1/generate/?inn=${encodeURIComponent(inn)}`, {
+    headers: {
+      Authorization: "Bearer " + access_token
+    }
+  });
+
+  if (!res.ok) {
+    alert("Ошибка генерации документа");
+    return;
+  }
+
+  const blob = await res.blob();
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = `document_${inn}.docx`;
+  document.body.appendChild(a);
+  a.click();
+
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
 </html>

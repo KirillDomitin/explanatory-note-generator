@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: auth-service
+Version: 0.1.0
+Summary: Authentication service with FastAPI, PostgreSQL, Redis, JWT and cookies
+Requires-Python: >=3.12
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: uvicorn[standard]>=0.30.0
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: asyncpg>=0.29.0
+Requires-Dist: redis>=5.0.0
+Requires-Dist: alembic>=1.13.0
+Requires-Dist: pydantic-settings>=2.4.0
+Requires-Dist: PyJWT>=2.9.0
+Requires-Dist: pwdlib[argon2]>=0.2.0
+Requires-Dist: psycopg[binary]>=3.3.3

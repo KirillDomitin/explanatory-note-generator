@@ -4,12 +4,13 @@ import os
 import tempfile
 
 from docxtpl import DocxTemplate
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Request, Depends
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 
 import settings
 from servises.generate_explanatory_note import explanatory_note
+from func.deps import get_current_user
 
 router = APIRouter()
 
@@ -22,7 +23,10 @@ router = APIRouter()
     summary="Пояснительная записка в ФНС",
     description="Подставляет в шаблон данные из выписки ЕГРЮЛ"
 )
-async def generate_document(inn: int):
+async def generate_document(
+        inn: int,
+        user=Depends(get_current_user)
+):
     """
     Пример вызова:
     http://192.168.1.100:8000/generate/?inn=770101001
