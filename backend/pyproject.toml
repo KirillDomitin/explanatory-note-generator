@@ -9,6 +9,8 @@ dependencies = [
     "requests>=2.32.5",
     "uvicorn>=0.40.0",
     "num2words>=0.5.14",
+    "PyJWT>=2.9.0",
+    "redis>=5.0.0",
 ]
 
 [tool.uv]

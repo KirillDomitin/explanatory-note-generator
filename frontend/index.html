@@ -1,184 +1,246 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<title>Dashboard</title>
-<style>
-:root {
-  --bg: #0e1117;
-  --card: #161b22;
-  --border: #30363d;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --accent: #2f81f7;
-}
+    <meta charset="UTF-8"/>
+    <title>Dashboard</title>
+    <style>
+        :root {
+          --bg: #0e1117;
+          --card: #161b22;
+          --border: #30363d;
+          --text: #e6edf3;
+          --muted: #8b949e;
+          --accent: #2f81f7;
+        }
 
-* {
-  box-sizing: border-box;
-  font-family: Inter, system-ui, sans-serif;
-}
+        * {
+          box-sizing: border-box;
+          font-family: Inter, system-ui, sans-serif;
+        }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-}
+        body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--text);
+        }
 
-/* Header */
-header {
-  padding: 20px 32px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+        /* Header */
+        header {
+          padding: 20px 32px;
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
 
-header h2 {
-  margin: 0;
-  font-size: 20px;
-}
+        header h2 {
+          margin: 0;
+          font-size: 20px;
+        }
 
-.logout {
-  color: var(--muted);
-  cursor: pointer;
-}
+        .logout {
+          color: var(--muted);
+          cursor: pointer;
+        }
 
-/* Content */
-.container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 0 24px;
-}
+        /* Content */
+        .container {
+          max-width: 900px;
+          margin: 40px auto;
+          padding: 0 24px;
+        }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.4);
-}
+        .card {
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          padding: 24px;
+          box-shadow: 0 12px 30px rgba(0,0,0,.4);
+        }
 
-.card h3 {
-  margin-top: 0;
-}
+        .card h3 {
+          margin-top: 0;
+        }
 
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #0d1117;
-  color: var(--text);
-  margin-bottom: 16px;
-}
+        input {
+          width: 100%;
+          padding: 14px;
+          border-radius: 10px;
+          border: 1px solid var(--border);
+          background: #0d1117;
+          color: var(--text);
+          margin-bottom: 16px;
+        }
 
-button {
-  padding: 14px 24px;
-  border-radius: 10px;
-  border: none;
-  background: var(--accent);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
+        button {
+          padding: 14px 24px;
+          border-radius: 10px;
+          border: none;
+          background: var(--accent);
+          color: white;
+          font-weight: 600;
+          cursor: pointer;
+        }
 
-pre {
-  margin-top: 20px;
-  background: #0d1117;
-  border-radius: 10px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  color: #9ecbff;
-}
-</style>
+        pre {
+          margin-top: 20px;
+          background: #0d1117;
+          border-radius: 10px;
+          padding: 16px;
+          border: 1px solid var(--border);
+          color: #9ecbff;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+    </style>
 </head>
 <body>
 
 <header>
-  <h2>🚀 Backend Dashboard</h2>
-  <div class="logout" onclick="logout()">Logout</div>
+    <h2>🚀 Backend Dashboard</h2>
+    <div class="logout" onclick="logout()">Logout</div>
 </header>
 
 <div class="container">
-  <div class="card">
-    <h3>Генератор пояснительной записки</h3>
-    <input id="value" placeholder="Введите ИНН..." />
-    <button onclick="send()">Генерировать</button>
-    <pre id="result"></pre>
-  </div>
+    <div class="card">
+        <h3>Генератор пояснительной записки</h3>
+        <input id="value" placeholder="Введите ИНН..."/>
+        <button onclick="send()">Генерировать</button>
+        <pre id="result"></pre>
+    </div>
 </div>
 
 <script>
-async function logout() {
-  const access_token = localStorage.getItem("access_token");
-  const refresh_token = localStorage.getItem("refresh_token");
+    document.addEventListener("DOMContentLoaded", async () => {
+      const ok = await ensureAuthenticated();
+      if (!ok) {
+        window.location.href = "/login.html";
+      }
+    });
 
-  const payload = {
-    access_token: access_token,
-    refresh_token: refresh_token
-  };
-  console.log(payload);
-  if (access_token) {
-    try {
-      // отправляем запрос logout на backend
-<!--      await fetch(`/api/v1/auth/logout/${encodeURIComponent(refresh_token)}`, {-->
-      await fetch(`/api/v1/auth/logout/`, {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + access_token,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-    } catch (err) {
-      console.error("Ошибка logout:", err);
-      // даже если запрос не прошёл, очищаем localStorage
+    async function ensureAuthenticated() {
+      try {
+        const res = await fetch("/api/v1/auth/me", {
+          method: "GET",
+          credentials: "include"
+        });
+
+        if (res.ok) {
+          return true;
+        }
+
+        if (res.status === 401) {
+          const refreshed = await tryRefresh();
+          if (!refreshed) {
+            return false;
+          }
+
+          const retry = await fetch("/api/v1/auth/me", {
+            method: "GET",
+            credentials: "include"
+          });
+
+          return retry.ok;
+        }
+
+        return false;
+      } catch (err) {
+        console.error("Auth check error:", err);
+        return false;
+      }
     }
-  }
 
-  // очищаем localStorage и переходим на страницу логина
-  localStorage.clear();
-  window.location.href = "/login.html";
-}
+    async function tryRefresh() {
+      try {
+        const res = await fetch("/api/v1/auth/refresh", {
+          method: "POST",
+          credentials: "include"
+        });
 
-async function send() {
-  const access_token = localStorage.getItem("access_token");
-  const refresh_token = localStorage.getItem("refresh_token");
-  if (!access_token) {
-    window.location.href = "/login.html";
-    return;
-  }
-
-  const inn = document.getElementById("value").value.trim();
-  if (!inn) {
-    alert("Введите ИНН");
-    return;
-  }
-
-  const res = await fetch(`/api/v1/generate/?inn=${encodeURIComponent(inn)}`, {
-    headers: {
-      Authorization: "Bearer " + access_token
+        return res.ok;
+      } catch (err) {
+        console.error("Refresh error:", err);
+        return false;
+      }
     }
-  });
 
-  if (!res.ok) {
-    alert("Ошибка генерации документа");
-    return;
-  }
+    async function logout() {
+      try {
+        await fetch("/api/v1/auth/logout", {
+          method: "POST",
+          credentials: "include"
+        });
+      } catch (err) {
+        console.error("Logout error:", err);
+      } finally {
+        window.location.href = "/login.html";
+      }
+    }
 
-  const blob = await res.blob();
+    async function send() {
+      const resultEl = document.getElementById("result");
+      resultEl.textContent = "";
 
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
+      const inn = document.getElementById("value").value.trim();
 
-  a.href = url;
-  a.download = `document_${inn}.docx`;
-  document.body.appendChild(a);
-  a.click();
+      if (!inn) {
+        alert("Введите ИНН");
+        return;
+      }
 
-  a.remove();
-  window.URL.revokeObjectURL(url);
-}
+      let res;
+      try {
+        res = await fetch(`/api/v1/generate/?inn=${encodeURIComponent(inn)}`, {
+          method: "GET",
+          credentials: "include"
+        });
+
+        if (res.status === 401) {
+          const refreshed = await tryRefresh();
+
+          if (!refreshed) {
+            window.location.href = "/login.html";
+            return;
+          }
+
+          res = await fetch(`/api/v1/generate/?inn=${encodeURIComponent(inn)}`, {
+            method: "GET",
+            credentials: "include"
+          });
+        }
+
+        if (!res.ok) {
+          const text = await safeText(res);
+          resultEl.textContent = text || "Ошибка генерации документа";
+          return;
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = `document_${inn}.docx`;
+        document.body.appendChild(a);
+        a.click();
+
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        resultEl.textContent = "Документ успешно сгенерирован";
+      } catch (err) {
+        console.error("Generate error:", err);
+        resultEl.textContent = "Ошибка сети или сервера";
+      }
+    }
+
+    async function safeText(res) {
+      try {
+        return await res.text();
+      } catch {
+        return "";
+      }
+    }
 </script>
 
 </body>

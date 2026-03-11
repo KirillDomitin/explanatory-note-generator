@@ -4,7 +4,7 @@ import os
 import tempfile
 
 from docxtpl import DocxTemplate
-from fastapi import HTTPException, status, Request, Depends
+from fastapi import HTTPException, status, Depends
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 
@@ -24,13 +24,9 @@ router = APIRouter()
     description="Подставляет в шаблон данные из выписки ЕГРЮЛ"
 )
 async def generate_document(
-        inn: int,
-        user=Depends(get_current_user)
+    inn: int,
+    user=Depends(get_current_user),
 ):
-    """
-    Пример вызова:
-    http://192.168.1.100:8000/generate/?inn=770101001
-    """
     if inn < 100000000 or inn > 999999999999999:
         raise HTTPException(status_code=400, detail="ИНН должен быть 10 или 12 цифр")
 
@@ -41,7 +37,6 @@ async def generate_document(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Внутренняя ошибка: {str(e)}")
 
-    # Временный файл для результата
     with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:
         output_path = tmp.name
 
@@ -54,13 +49,10 @@ async def generate_document(
             path=output_path,
             filename=f"Пояснения_{inn}.docx",
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            headers={"X-Content-Type-Options": "nosniff"}
+            headers={"X-Content-Type-Options": "nosniff"},
         )
 
     except Exception as e:
         if os.path.exists(output_path):
             os.unlink(output_path)
         raise HTTPException(status_code=500, detail=f"Ошибка генерации документа: {str(e)}")
-
-    finally:
-        pass

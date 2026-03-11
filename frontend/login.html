@@ -1,122 +1,167 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<title>Sign in</title>
-<style>
-:root {
-  --bg: #0e1117;
-  --card: #161b22;
-  --border: #30363d;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --accent: #2f81f7;
-}
+    <meta charset="UTF-8"/>
+    <title>Sign in</title>
+    <style>
+        :root {
+          --bg: #0e1117;
+          --card: #161b22;
+          --border: #30363d;
+          --text: #e6edf3;
+          --muted: #8b949e;
+          --accent: #2f81f7;
+        }
 
-* {
-  box-sizing: border-box;
-  font-family: Inter, system-ui, sans-serif;
-}
+        * {
+          box-sizing: border-box;
+          font-family: Inter, system-ui, sans-serif;
+        }
 
-body {
-  margin: 0;
-  height: 100vh;
-  background: radial-gradient(circle at top, #1f2937, var(--bg));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text);
-}
+        body {
+          margin: 0;
+          height: 100vh;
+          background: radial-gradient(circle at top, #1f2937, var(--bg));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text);
+        }
 
-.card {
-  width: 380px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.5);
-}
+        .card {
+          width: 380px;
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          padding: 32px;
+          box-shadow: 0 20px 40px rgba(0,0,0,.5);
+        }
 
-h1 {
-  margin: 0 0 8px;
-  font-size: 26px;
-}
+        h1 {
+          margin: 0 0 8px;
+          font-size: 26px;
+        }
 
-p {
-  margin: 0 0 24px;
-  color: var(--muted);
-}
+        p {
+          margin: 0 0 24px;
+          color: var(--muted);
+        }
 
-input {
-  width: 100%;
-  padding: 14px;
-  margin-bottom: 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #0d1117;
-  color: var(--text);
-  font-size: 15px;
-}
+        input {
+          width: 100%;
+          padding: 14px;
+          margin-bottom: 14px;
+          border-radius: 10px;
+          border: 1px solid var(--border);
+          background: #0d1117;
+          color: var(--text);
+          font-size: 15px;
+        }
 
-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
+        input:focus {
+          outline: none;
+          border-color: var(--accent);
+        }
 
-button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, #1f6feb, var(--accent));
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
+        button {
+          width: 100%;
+          padding: 14px;
+          border-radius: 10px;
+          border: none;
+          background: linear-gradient(135deg, #1f6feb, var(--accent));
+          color: white;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+        }
 
-button:hover {
-  opacity: .9;
-}
-</style>
+        button:hover {
+          opacity: .9;
+        }
+
+        .error {
+          margin-top: 14px;
+          color: #ff7b72;
+          font-size: 14px;
+        }
+    </style>
 </head>
 <body>
 
 <div class="card">
-  <h1>Welcome back</h1>
-  <p>Sign in to continue</p>
+    <h1>Welcome back</h1>
+    <p>Sign in to continue</p>
 
-  <input id="login" placeholder="Login" />
-  <input id="password" type="password" placeholder="Password" />
+    <input id="login" placeholder="Login"/>
+    <input id="password" type="password" placeholder="Password"/>
 
-  <button onclick="login()">Sign in</button>
+    <button onclick="login()">Sign in</button>
+    <div id="error" class="error"></div>
 </div>
 
 <script>
-async function login() {
-  const form = new URLSearchParams();
-  form.append("username", document.getElementById("login").value);
-  form.append("password", document.getElementById("password").value);
+    async function checkExistingSession() {
+      try {
+        const res = await fetch("/api/v1/auth/me", {
+          method: "GET",
+          credentials: "include"
+        });
 
-  const res = await fetch("/api/v1/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: form.toString()
-  });
+        if (res.ok) {
+          window.location.href = "/";
+        }
+      } catch (err) {
+        console.error("Session check error:", err);
+      }
+    }
 
-  if (!res.ok) {
-    alert("Invalid login or password");
-    return;
-  }
+    async function login() {
+      const errorEl = document.getElementById("error");
+      errorEl.textContent = "";
 
-  const data = await res.json();
-  localStorage.setItem("access_token", data.access_token);
-  localStorage.setItem("refresh_token", data.refresh_token);
+      const username = document.getElementById("login").value.trim();
+      const password = document.getElementById("password").value;
 
-  window.location.href = "/";
-}
+      if (!username || !password) {
+        errorEl.textContent = "Введите логин и пароль";
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            username,
+            password
+          })
+        });
+
+        if (!res.ok) {
+          const data = await safeJson(res);
+          errorEl.textContent = data?.detail || "Invalid login or password";
+          return;
+        }
+
+        window.location.href = "/";
+      } catch (err) {
+        console.error("Login error:", err);
+        errorEl.textContent = "Ошибка сети или сервера";
+      }
+    }
+
+    async function safeJson(res) {
+      try {
+        return await res.json();
+      } catch {
+        return null;
+      }
+    }
+
+    checkExistingSession();
 </script>
 
 </body>

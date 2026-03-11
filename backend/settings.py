@@ -6,6 +6,14 @@ URL = "https://egrul.itsoft.ru/{}.json"
 HEADERS = {"Accept": "application/json"}
 TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), "docx_templates", "template_explanatory_note.docx")
 
+JWT_ACCESS_SECRET = os.getenv("JWT_ACCESS_SECRET", "super_secret_access_key_12345")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+ACCESS_COOKIE_NAME = os.getenv("ACCESS_COOKIE_NAME", "access_token")
+
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_DB = int(os.getenv("REDIS_DB", 0))
+
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': True,

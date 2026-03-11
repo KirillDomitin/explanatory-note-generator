@@ -16,8 +16,8 @@ async def create_admin() -> None:
         try:
             user = await user_service.create_user(
                 UserCreate(
-                    username=settings.ADMIN_USERNAME,
-                    password=settings.ADMIN_PASSWORD,
+                    username=settings.FIRST_ADMIN_USERNAME,
+                    password=settings.FIRST_ADMIN_PASSWORD,
                     role=UserRole.ADMIN,
                     is_active=True,
                 )
@@ -26,7 +26,7 @@ async def create_admin() -> None:
             print(f"Admin user created: {user.username}")
         except UserAlreadyExistsError:
             await session.rollback()
-            print(f"Admin user '{settings.ADMIN_USERNAME}' already exists")
+            print(f"Admin user '{settings.FIRST_ADMIN_USERNAME}' already exists")
 
 
 if __name__ == "__main__":
