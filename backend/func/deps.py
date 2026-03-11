@@ -26,25 +26,6 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Access token is missing",
         )
-    print(access_token)
-    print(access_token)
-    print(access_token)
-    print(access_token)
-    print(access_token)
-    print(access_token)
-    print(access_token)
-    print(access_token)
-    print(access_token)
-    print(settings.JWT_ACCESS_SECRET)
-    print(settings.JWT_ACCESS_SECRET)
-    print(settings.JWT_ACCESS_SECRET)
-    print(settings.JWT_ACCESS_SECRET)
-    print(settings.JWT_ACCESS_SECRET)
-    print(settings.JWT_ALGORITHM)
-    print(settings.JWT_ALGORITHM)
-    print(settings.JWT_ALGORITHM)
-    print(settings.JWT_ALGORITHM)
-    print(settings.JWT_ALGORITHM)
     try:
         payload = jwt.decode(
             access_token,
