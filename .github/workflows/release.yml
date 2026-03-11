@@ -3,7 +3,7 @@ name: Release to Docker Hub
 on:
   push:
     tags:
-      - 'v*.*.*'          # v0.0.1, v1.2.3 и т.д.
+      - 'v*.*.*'
 
 jobs:
   test-and-build:
@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Backend: тесты и сборка
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -43,7 +41,6 @@ jobs:
         id: vars
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      # Backend — билд и пуш
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
@@ -54,15 +51,22 @@ jobs:
             domitin/docx-backend:latest
             domitin/docx-backend:${{ steps.vars.outputs.version }}
 
-      # Frontend — билд и пуш (без тестов)
-      - name: Build and push frontend image
+      - name: Build and push auth_service image
         uses: docker/build-push-action@v6
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          context: ./auth_service
+          file: ./auth_service/Dockerfile
           push: true
-          build-args: |
-            APP_VERSION=${{ steps.vars.outputs.version }}
           tags: |
-            domitin/docx-frontend:latest
-            domitin/docx-frontend:${{ steps.vars.outputs.version }}
+            domitin/docx-auth-service:latest
+            domitin/docx-auth-service:${{ steps.vars.outputs.version }}
+
+      - name: Build and push nginx image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.nginx
+          push: true
+          tags: |
+            domitin/docx-nginx:latest
+            domitin/docx-nginx:${{ steps.vars.outputs.version }}
