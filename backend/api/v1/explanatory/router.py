@@ -44,7 +44,7 @@ async def generate_document(
     try:
         if not context:
             context = await explanatory_note(inn)
-            await cache.set_cached_data(str(inn), context)
+            await cache_service.set_cached_data(str(inn), context)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
