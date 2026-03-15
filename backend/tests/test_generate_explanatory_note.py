@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from .moks import MOCK_RESPONSES
-from ..servises.generate_explanatory_note import explanatory_note
+from ..services.generate_explanatory_note import explanatory_note
 
 # Добавляем корень backend в sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))

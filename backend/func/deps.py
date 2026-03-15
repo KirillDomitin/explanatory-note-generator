@@ -18,8 +18,12 @@ redis_client = Redis(
 )
 
 
+async def get_redis() -> Redis:
+    return redis_client
+
+
 async def get_current_user(
-    access_token: str | None = Cookie(default=None, alias=settings.ACCESS_COOKIE_NAME),
+        access_token: str | None = Cookie(default=None, alias=settings.ACCESS_COOKIE_NAME),
 ) -> dict[str, Any]:
     if not access_token:
         raise HTTPException(

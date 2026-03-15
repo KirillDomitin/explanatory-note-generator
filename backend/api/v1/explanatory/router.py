@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 
 import settings
-from servises.generate_explanatory_note import explanatory_note
+from services.generate_explanatory_note import explanatory_note
 from func.deps import get_current_user
 
 router = APIRouter()
