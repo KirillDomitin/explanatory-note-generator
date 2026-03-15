@@ -19,7 +19,8 @@ class RedisService:
         cache = await self.redis.get(inn)
         if cache:
             logger.info(f"Результат по {inn} из кэша")
-        return json.loads(cache)
+            return json.loads(cache)
+        return cache
 
     async def set_cached_data(self, inn: str, payload: dict):
         await self.redis.set(
