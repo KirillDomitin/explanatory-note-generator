@@ -4,10 +4,7 @@ import logging
 import httpx
 from func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date, \
     get_response
-from func.deps import get_redis
 from settings import URL, HEADERS
-
-from .redis_service import RedisService
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -18,11 +15,6 @@ logging.basicConfig(
 
 async def explanatory_note(inn: int):
     logger.info(f"Запрос ИНН: {inn}")
-
-    cache = RedisService(await get_redis())
-    if cache_result := await cache.get_cached_result(str(inn)):
-        logger.info(f"Результат по {inn} из кэша")
-        return json.loads(cache_result)
 
     try:
         response = await get_response(URL.format(inn))
@@ -103,8 +95,5 @@ async def explanatory_note(inn: int):
         "ceos": ceos,
         "staff_administration": staff_administration
     }
-
-    await cache.set_cached_data(str(inn), result)
-    logger.info(f"Результат по {inn} закэширован на 24 часа")
 
     return result
