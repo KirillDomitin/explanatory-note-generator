@@ -27,7 +27,7 @@ jobs:
           uv sync --dev
 
       - name: Run backend tests
-        working-directory: ./backend
+        working-directory: ./backend/src
         run: |
           uv run pytest -v
 
