@@ -22,7 +22,7 @@ jobs:
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Install backend dependencies
-        working-directory: ./backend
+        working-directory: ./backend/src
         run: |
           uv sync --dev
 
