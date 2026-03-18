@@ -15,7 +15,8 @@ services:
       - ./backend:/src
 
   nginx:
-    image: nginx:alpine
+    build:
+      dockerfile: Dockerfile.nginx
     ports:
       - "80:80"
       - "443:443"
