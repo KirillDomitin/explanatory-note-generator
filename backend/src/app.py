@@ -4,7 +4,9 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from src.api.v1.router import api_router
-from src.core.config import settings
+from src.core.config import get_settings
+
+settings = get_settings()
 
 app = FastAPI(title="Генератор пояснений по ИНН", debug=True)
 app.include_router(api_router, prefix="/api/v1")

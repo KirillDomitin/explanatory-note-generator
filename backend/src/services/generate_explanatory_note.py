@@ -4,7 +4,9 @@ import logging
 import httpx
 from src.func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date, \
     get_response
-from src.core.config import settings
+from src.core.config import get_settings
+
+settings = get_settings()
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(

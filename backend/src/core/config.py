@@ -2,6 +2,8 @@ import logging
 import os
 
 from pathlib import Path
+
+from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -127,4 +129,6 @@ class Settings(BaseSettings):
         auth_part = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
         return f"redis://{auth_part}{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

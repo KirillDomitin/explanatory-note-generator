@@ -5,10 +5,13 @@ from typing import Any
 from uuid import UUID
 
 import jwt
-from src.core.config import settings
 from fastapi import Cookie, HTTPException, status
 from jwt import ExpiredSignatureError, InvalidTokenError
 from redis.asyncio import Redis
+
+from src.core.config import get_settings
+
+settings = get_settings()
 
 redis_client = Redis(
     host=settings.redis_host,

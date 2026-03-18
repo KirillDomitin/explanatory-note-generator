@@ -4,9 +4,11 @@ import logging
 
 import httpx
 
-from src.core.config import settings
+from src.core.config import get_settings
 
-logger  = logging.getLogger(__name__)
+settings = get_settings()
+
+logger = logging.getLogger(__name__)
 
 
 async def get_response(url: str):

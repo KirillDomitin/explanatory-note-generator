@@ -6,7 +6,10 @@ import tempfile
 from docxtpl import DocxTemplate
 from fastapi import HTTPException
 
-from src.core.config import settings
+from src.core.config import get_settings
+
+settings = get_settings()
+
 
 def create_docx_file(context: dict) -> str:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:

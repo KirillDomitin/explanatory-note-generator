@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.routing import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.config import settings
+from src.core.config import get_settings
 from src.db.session import get_db
 from src.db.models import RequestStatus
 from src.func.deps import get_current_user, get_redis
@@ -23,6 +23,7 @@ logging.basicConfig(
 
 router = APIRouter()
 
+settings = get_settings()
 
 @router.get(
     "/",
