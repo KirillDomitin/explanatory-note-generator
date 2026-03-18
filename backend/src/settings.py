@@ -10,8 +10,8 @@ JWT_ACCESS_SECRET = os.getenv("JWT_ACCESS_SECRET", "super_secret_access_key_1234
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_COOKIE_NAME = os.getenv("ACCESS_COOKIE_NAME", "access_token")
 
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6380))
 REDIS_DB = int(os.getenv("REDIS_DB", 0))
 
 LOGGING_CONFIG = {

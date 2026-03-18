@@ -2,9 +2,9 @@ import json
 import logging
 
 import httpx
-from func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date, \
+from src.func import get_address, get_ceo, get_charter_capital, get_okved, get_participants, get_registration_date, \
     get_response
-from settings import URL, HEADERS
+from src.core.config import settings
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -17,7 +17,7 @@ async def explanatory_note(inn: int):
     logger.info(f"Запрос ИНН: {inn}")
 
     try:
-        response = await get_response(URL.format(inn))
+        response = await get_response(settings.url.format(inn))
         response.raise_for_status()
     except httpx.HTTPError as e:
         raise ValueError(f"API вернул ошибку: {e}")

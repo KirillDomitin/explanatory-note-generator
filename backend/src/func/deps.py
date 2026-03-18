@@ -5,15 +5,15 @@ from typing import Any
 from uuid import UUID
 
 import jwt
-import settings
+from src.core.config import settings
 from fastapi import Cookie, HTTPException, status
 from jwt import ExpiredSignatureError, InvalidTokenError
 from redis.asyncio import Redis
 
 redis_client = Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=settings.REDIS_DB,
+    host=settings.redis_host,
+    port=settings.redis_port,
+    db=settings.redis_db,
     decode_responses=True,
 )
 
@@ -23,7 +23,7 @@ async def get_redis() -> Redis:
 
 
 async def get_current_user(
-        access_token: str | None = Cookie(default=None, alias=settings.ACCESS_COOKIE_NAME),
+        access_token: str | None = Cookie(default=None, alias=settings.access_cookie_name),
 ) -> dict[str, Any]:
     if not access_token:
         raise HTTPException(
@@ -33,8 +33,8 @@ async def get_current_user(
     try:
         payload = jwt.decode(
             access_token,
-            settings.JWT_ACCESS_SECRET,
-            algorithms=[settings.JWT_ALGORITHM],
+            settings.jwt_access_secret,
+            algorithms=[settings.jwt_algorithm],
         )
     except ExpiredSignatureError:
         raise HTTPException(

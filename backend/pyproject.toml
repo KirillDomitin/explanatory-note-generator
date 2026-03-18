@@ -11,6 +11,12 @@ dependencies = [
     "num2words>=0.5.14",
     "PyJWT>=2.9.0",
     "redis>=5.0.0",
+    "pydantic-settings>=2.13.1",
+    "httpx>=0.28.1",
+    "alembic>=1.18.4",
+    "psycopg[binary]>=3.3.3",
+    "sqlalchemy[asyncio]>=2.0.48",
+    "asyncpg>=0.31.0",
 ]
 
 [tool.uv]
