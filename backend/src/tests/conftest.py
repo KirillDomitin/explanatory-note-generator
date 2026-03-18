@@ -12,19 +12,19 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    url: str
-    headers: str
-    jwt_access_secret: str
-    jwt_algorithm: str
-    access_cookie_name: str
-    redis_host: str
-    redis_port: int
-    redis_db: int
-    auth_postgres_host: str
-    auth_postgres_port: int
-    auth_postgres_db: str
-    auth_postgres_user: str
-    auth_postgres_password: str
+    url: str = "https://test.local"
+    headers: str = "{}"
+    jwt_access_secret: str = "test-secret"
+    jwt_algorithm: str = "HS256"
+    access_cookie_name: str = "access_token"
+    redis_host: str = "localhost"
+    redis_port: int = 6379
+    redis_db: int = 0
+    auth_postgres_host: str = "localhost"
+    auth_postgres_port: int = 5432
+    auth_postgres_db: str = "test_db"
+    auth_postgres_user: str = "test_user"
+    auth_postgres_password: str = "test_password"
 
     model_config = SettingsConfigDict(
         env_file=".env",
