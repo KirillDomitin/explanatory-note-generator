@@ -8,10 +8,9 @@ from fastapi import HTTPException
 
 from src.core.config import get_settings
 
-settings = get_settings()
-
 
 def create_docx_file(context: dict) -> str:
+    settings = get_settings()
     with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:
         output_path = tmp.name
 
