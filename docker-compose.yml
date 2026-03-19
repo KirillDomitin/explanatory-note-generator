@@ -12,7 +12,7 @@ services:
     expose:
       - "8000"
     volumes:
-      - ./backend:/src
+      - ./backend/src:/src
 
   nginx:
     build:

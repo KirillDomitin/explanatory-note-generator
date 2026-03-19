@@ -27,7 +27,7 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,  # убрать в продакшене
-        log_config=settings.LOGGING_CONFIG,
-        log_level="INFO"
+        log_config=settings.logging_config,
+        log_level="DEBUG"
         # workers=1            # если много запросов — можно увеличить
     )
