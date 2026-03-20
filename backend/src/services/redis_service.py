@@ -23,9 +23,12 @@ class RedisService:
         return cache
 
     async def set_cached_data(self, inn: str, payload: dict):
-        await self.redis.set(
-            inn,
-            json.dumps(payload),
-            ex=24 * 60 * 60,
-        )
-        logger.info(f"Результат по {inn} закэширован на 24 часа")
+        if await self.redis.get(inn):
+            logger.info(f"{inn} уже закэширован")
+        else:
+            await self.redis.set(
+                inn,
+                json.dumps(payload),
+                ex=24 * 60 * 60,
+            )
+            logger.info(f"Результат по {inn} закэширован на 24 часа")
