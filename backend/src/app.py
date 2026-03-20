@@ -8,7 +8,12 @@ from src.core.config import get_settings
 
 settings = get_settings()
 
-app = FastAPI(title="Генератор пояснений по ИНН", debug=True)
+app = FastAPI(
+    title="Генератор пояснений по ИНН",
+    debug=True,
+    docs_url="/backend/docs",
+    openapi_url="/backend/openapi.json",
+)
 app.include_router(api_router, prefix="/api/v1")
 
 app.add_middleware(

@@ -11,6 +11,8 @@
           --text: #e6edf3;
           --muted: #8b949e;
           --accent: #2f81f7;
+          --success: #2ea043;
+          --danger: #f85149;
         }
 
         * {
@@ -24,7 +26,6 @@
           color: var(--text);
         }
 
-        /* Header */
         header {
           padding: 20px 32px;
           border-bottom: 1px solid var(--border);
@@ -43,11 +44,21 @@
           cursor: pointer;
         }
 
-        /* Content */
+        .logout:hover {
+          color: var(--text);
+        }
+
         .container {
-          max-width: 900px;
+          max-width: 1280px;
           margin: 40px auto;
           padding: 0 24px;
+        }
+
+        .layout {
+          display: grid;
+          grid-template-columns: minmax(420px, 1.2fr) minmax(320px, 0.8fr);
+          gap: 24px;
+          align-items: start;
         }
 
         .card {
@@ -55,11 +66,12 @@
           border: 1px solid var(--border);
           border-radius: 16px;
           padding: 24px;
-          box-shadow: 0 12px 30px rgba(0,0,0,.4);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, .4);
         }
 
         .card h3 {
           margin-top: 0;
+          margin-bottom: 20px;
         }
 
         input {
@@ -70,6 +82,11 @@
           background: #0d1117;
           color: var(--text);
           margin-bottom: 16px;
+          outline: none;
+        }
+
+        input:focus {
+          border-color: var(--accent);
         }
 
         button {
@@ -82,6 +99,11 @@
           cursor: pointer;
         }
 
+        button:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
         pre {
           margin-top: 20px;
           background: #0d1117;
@@ -91,6 +113,83 @@
           color: #9ecbff;
           white-space: pre-wrap;
           word-break: break-word;
+          min-height: 72px;
+        }
+
+        .history-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .history-item {
+          background: #0d1117;
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 14px;
+        }
+
+        .history-item-clickable {
+          cursor: pointer;
+          transition: 0.15s;
+        }
+
+        .history-item-clickable:hover {
+          border-color: var(--accent);
+          background: #111827;
+        }
+
+        .history-item-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 10px;
+        }
+
+        .status-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .status-success {
+          background: var(--success);
+        }
+
+        .status-failed {
+          background: var(--danger);
+        }
+
+        .history-date {
+          font-size: 14px;
+        }
+
+        .history-line {
+          font-size: 14px;
+          line-height: 1.5;
+        }
+
+        .history-name {
+          color: var(--muted);
+        }
+
+        .history-error {
+          margin-top: 6px;
+          color: var(--danger);
+        }
+
+        .history-loading,
+        .history-empty,
+        .history-error-state {
+          color: var(--muted);
+          font-size: 14px;
+        }
+
+        @media (max-width: 980px) {
+          .layout {
+            grid-template-columns: 1fr;
+          }
         }
     </style>
 </head>
@@ -102,145 +201,191 @@
 </header>
 
 <div class="container">
-    <div class="card">
-        <h3>Генератор пояснительной записки</h3>
-        <input id="value" placeholder="Введите ИНН..."/>
-        <button onclick="send()">Генерировать</button>
-        <pre id="result"></pre>
+    <div class="layout">
+        <div class="card">
+            <h3>Генератор пояснительной записки</h3>
+            <input id="value" placeholder="Введите ИНН..."/>
+            <button id="generate-btn" onclick="send()">Генерировать</button>
+            <pre id="result"></pre>
+        </div>
+
+        <div class="card">
+            <h3>История запросов</h3>
+            <div id="history-list" class="history-list">
+                <div class="history-loading">Загрузка истории...</div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const ok = await ensureAuthenticated();
-      if (!ok) {
-        window.location.href = "/login.html";
-      }
+const HISTORY_LIMIT = 20;
+const LOGIN_PAGE_URL = "/login.html";
+
+const historyEl = document.getElementById("history-list");
+const resultEl = document.getElementById("result");
+const innInputEl = document.getElementById("value");
+const generateButtonEl = document.getElementById("generate-btn");
+
+document.addEventListener("DOMContentLoaded", initPage);
+
+async function initPage() {
+  const isAuthenticated = await ensureAuthenticated();
+  if (!isAuthenticated) return redirectToLogin();
+  await loadHistory();
+}
+
+async function authFetch(url, options = {}, retry = true) {
+  const res = await fetch(url, { credentials: "include", ...options });
+
+  if (res.status !== 401) return res;
+
+  if (!retry) {
+    redirectToLogin();
+    return res;
+  }
+
+  const refreshed = await tryRefresh();
+  if (!refreshed) {
+    redirectToLogin();
+    return res;
+  }
+
+  return fetch(url, { credentials: "include", ...options });
+}
+
+async function ensureAuthenticated() {
+  const res = await authFetch("/api/v1/auth/me");
+  return res.ok;
+}
+
+async function tryRefresh() {
+  try {
+    const res = await fetch("/api/v1/auth/refresh", {
+      method: "POST",
+      credentials: "include"
     });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
-    async function ensureAuthenticated() {
-      try {
-        const res = await fetch("/api/v1/auth/me", {
-          method: "GET",
-          credentials: "include"
-        });
+async function logout() {
+  await fetch("/api/v1/auth/logout", { method: "POST", credentials: "include" });
+  redirectToLogin();
+}
 
-        if (res.ok) {
-          return true;
-        }
+async function loadHistory() {
+  setHistoryState("loading");
 
-        if (res.status === 401) {
-          const refreshed = await tryRefresh();
-          if (!refreshed) {
-            return false;
-          }
+  try {
+    const res = await authFetch(`/api/v1/user-requests?limit=${HISTORY_LIMIT}&offset=0`);
+    if (!res.ok) return setHistoryState("error");
 
-          const retry = await fetch("/api/v1/auth/me", {
-            method: "GET",
-            credentials: "include"
-          });
+    const data = await res.json();
+    renderHistory(data.items || []);
+  } catch {
+    setHistoryState("error");
+  }
+}
 
-          return retry.ok;
-        }
+function renderHistory(items) {
+  historyEl.innerHTML = "";
 
-        return false;
-      } catch (err) {
-        console.error("Auth check error:", err);
-        return false;
-      }
+  if (!items.length) {
+    return setHistoryState("empty");
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  for (const item of items) {
+    const isSuccess = item.status === "success";
+
+    const el = document.createElement("div");
+    el.className = "history-item";
+
+    if (isSuccess && item.inn) {
+      el.classList.add("history-item-clickable");
+
+      el.addEventListener("click", () => {
+        innInputEl.value = item.inn;
+        innInputEl.focus();
+        innInputEl.select();
+      });
     }
 
-    async function tryRefresh() {
-      try {
-        const res = await fetch("/api/v1/auth/refresh", {
-          method: "POST",
-          credentials: "include"
-        });
+    el.innerHTML = `
+      <div class="history-item-header">
+        <span class="status-dot ${isSuccess ? "status-success" : "status-failed"}"></span>
+        <div class="history-date">${formatDate(item.created_at)}</div>
+      </div>
 
-        return res.ok;
-      } catch (err) {
-        console.error("Refresh error:", err);
-        return false;
-      }
+      <div class="history-line">ИНН: ${item.inn || "—"}</div>
+      <div class="history-line history-name">${item.name || "—"}</div>
+
+      ${!isSuccess && item.error_message
+        ? `<div class="history-line history-error">Ошибка: ${item.error_message}</div>`
+        : ""}
+    `;
+
+    fragment.appendChild(el);
+  }
+
+  historyEl.appendChild(fragment);
+}
+
+function formatDate(value) {
+  const d = new Date(value);
+  return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+
+function setHistoryState(state) {
+  if (state === "loading") historyEl.innerHTML = `<div class="history-loading">Загрузка...</div>`;
+  if (state === "empty") historyEl.innerHTML = `<div class="history-empty">История пуста</div>`;
+  if (state === "error") historyEl.innerHTML = `<div class="history-error-state">Ошибка загрузки</div>`;
+}
+
+async function send() {
+  const inn = innInputEl.value.trim();
+  if (!inn) return resultEl.textContent = "Введите ИНН";
+
+  generateButtonEl.disabled = true;
+  resultEl.textContent = "Выполняется...";
+
+  try {
+    const res = await authFetch(`/api/v1/generate/?inn=${encodeURIComponent(inn)}`);
+
+    if (!res.ok) {
+      resultEl.textContent = await res.text() || "Ошибка";
+      return;
     }
 
-    async function logout() {
-      try {
-        await fetch("/api/v1/auth/logout", {
-          method: "POST",
-          credentials: "include"
-        });
-      } catch (err) {
-        console.error("Logout error:", err);
-      } finally {
-        window.location.href = "/login.html";
-      }
-    }
+    const blob = await res.blob();
+    downloadBlob(blob, `document_${inn}.docx`);
+    resultEl.textContent = "Готово";
+  } catch {
+    resultEl.textContent = "Ошибка сети";
+  } finally {
+    generateButtonEl.disabled = false;
+    await loadHistory();
+  }
+}
 
-    async function send() {
-      const resultEl = document.getElementById("result");
-      resultEl.textContent = "";
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
-      const inn = document.getElementById("value").value.trim();
-
-      if (!inn) {
-        alert("Введите ИНН");
-        return;
-      }
-
-      let res;
-      try {
-        res = await fetch(`/api/v1/generate/?inn=${encodeURIComponent(inn)}`, {
-          method: "GET",
-          credentials: "include"
-        });
-
-        if (res.status === 401) {
-          const refreshed = await tryRefresh();
-
-          if (!refreshed) {
-            window.location.href = "/login.html";
-            return;
-          }
-
-          res = await fetch(`/api/v1/generate/?inn=${encodeURIComponent(inn)}`, {
-            method: "GET",
-            credentials: "include"
-          });
-        }
-
-        if (!res.ok) {
-          const text = await safeText(res);
-          resultEl.textContent = text || "Ошибка генерации документа";
-          return;
-        }
-
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-
-        a.href = url;
-        a.download = `document_${inn}.docx`;
-        document.body.appendChild(a);
-        a.click();
-
-        a.remove();
-        window.URL.revokeObjectURL(url);
-
-        resultEl.textContent = "Документ успешно сгенерирован";
-      } catch (err) {
-        console.error("Generate error:", err);
-        resultEl.textContent = "Ошибка сети или сервера";
-      }
-    }
-
-    async function safeText(res) {
-      try {
-        return await res.text();
-      } catch {
-        return "";
-      }
-    }
+function redirectToLogin() {
+  window.location.href = LOGIN_PAGE_URL;
+}
 </script>
 
 </body>

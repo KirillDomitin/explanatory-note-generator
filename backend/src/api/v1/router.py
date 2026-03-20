@@ -19,6 +19,5 @@ api_router.include_router(
 )
 api_router.include_router(
     user_router,
-    prefix="/user-requests",
     tags=["user-requests"]
 )
